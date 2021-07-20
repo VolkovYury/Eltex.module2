@@ -74,17 +74,26 @@ void numbersInString(char* str) {
 	int count = 0;
 	bool prewNum = false; // флаг "предыдущий символ был числом"
 
-	while (str[indexStr] != '\0') {
+	for (int i = 0; str[i] != '\0'; i++) {
 		// если обрабатываемый символ - число, тогда ...
-		if (isdigit(str[indexStr])) {
+		if (isdigit(str[i])) {
 			// если предыдущий символ также был числом, тогда
 			if (prewNum) {
 				count++;
-				result[count] = str[indexStr]; // строка с числом заполняется
+				result[count] = str[i]; // строка с числом заполняется
 			}
 			// если предыдущий символ не был числом
 			else {
-				result[0] = str[indexStr]; // начинает заполняться строка
+				result[0] = str[i]; // начинает заполняться строка
+			}
+
+			// на случай, если число будет стоять в конце строки
+			if (str[i + 1] == '\0') {
+				count++;
+				result[count] = '\0';
+				numberProcessing(&result);
+				count = 0;
+				memset(result, 0, 100);
 			}
 
 			prewNum = true;
@@ -106,14 +115,13 @@ void numbersInString(char* str) {
 			prewNum = false;
 		}
 
-		indexStr++;
 	}
 }
 
 int main() {
 	char* locale = setlocale(LC_ALL, "");
 
-	char str[MAXSTRING] = "aaa2010101bbb8343ccc12ddd\0";
+	char str[MAXSTRING] = "eee8343c12ttt\0";
 
 	numbersInString(&str); // функция поиска чисел в строке
 
