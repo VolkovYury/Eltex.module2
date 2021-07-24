@@ -10,10 +10,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define KNAPSACK 22
-#define NUMBEROFITEMS 3
+#define KNAPSACK 22			// вместимость рюкзака
+#define NUMBEROFITEMS 3		// количество типов предметов
 
-#define COLUMNS 5
+#define COLUMNS 5			// количество колонок в исходной матрице
 
 
 void printResult(int * res, int size) {
@@ -22,20 +22,17 @@ void printResult(int * res, int size) {
 	for (int i = 0; i < size; i++) {
 		printf("%d ", res[i]);
 	}
+
+	printf("\n");
 }
 
 void filling(int rows, float arr[][COLUMNS]) {
 	float result = 0; // текущий вес рюкзака
 	float totalCost = 0;
 
-	int numbersOfItems[100];
+	int numbersOfItems[500]; // 500 предметов будет вмещать мешок
 	
-	//int* numbersOfItems = malloc(100 * sizeof(int)); // Попытался выделить память динамически (100 - для примера). 
-	// void в данной функции (filling) поменял на int*. В main написал - "int* arrayResult = filling(NUMBEROFITEMS, arr)";
-	// В результате код компилируется, но после работы функции на этапе присаивания появляется исключение, связанное с доступом к памяти
-	
-	
-	int countNumberOfItem = 0; // счётчик для заполнения вышеуказанного массива numbersOfItems[]
+	int countNumberOfItem = 0; // счётчик для заполнения вышеуказанного массива numbersOfItems[].
 	
 	// прогон по каждому типу вещей
 	for (int i = 0; i < rows; i++) {
@@ -48,6 +45,7 @@ void filling(int rows, float arr[][COLUMNS]) {
 				if (arr[i][4] == -1) {
 					// количество вещей данного типа неограничено. Складывать, пока не закончится место
 					result += arr[i][2];
+
 					numbersOfItems[countNumberOfItem] = arr[i][0];
 					totalCost += arr[i][1];
 
@@ -62,6 +60,7 @@ void filling(int rows, float arr[][COLUMNS]) {
 					// если предметы ещё есть
 					if (countNumberOfItemsUsed < arr[i][4]) {
 						result += arr[i][2];
+
 						numbersOfItems[countNumberOfItem] = arr[i][0];
 						totalCost += arr[i][1];
 
@@ -82,8 +81,9 @@ void filling(int rows, float arr[][COLUMNS]) {
 		}
 	}
 
-	printf("Оптимальная стоимость содержимого рюкзака: %.3f\n", totalCost);
+	printf("Итоговая стоимость собранных предметов: %.3f\n", totalCost);
 	printResult(&numbersOfItems, countNumberOfItem);
+
 }
 
 //сортировка строк массива по убыванию по значению столбца с удельным весом. Пузырьковая
@@ -124,7 +124,7 @@ void calcUnitCost(int rows, float arr[][COLUMNS]) {
 
 // вывод информации на экран
 void printInfo(int rows, float arr[][COLUMNS]) {
-	printf("Иcходные данные:\n");
+	printf("Имеющиеся на данный момент данные:\n");
 
 	for (int i = 0; i < rows; i++) {
 
@@ -142,7 +142,7 @@ void printInfo(int rows, float arr[][COLUMNS]) {
 			printf("Количество предметов неограничено.\n");
 		}
 		else {
-			printf("Количество имеющихся предметов - %.0f. ", arr[i][4]);
+			printf("Количество имеющихся предметов - %.0f.\n", arr[i][4]);
 		}
 	}
 }
@@ -152,16 +152,15 @@ int main() {
 	char* locale = setlocale(LC_ALL, "");
 
 	// Матрица предметов: id предмета, ценность, вес, удельная стоимость (0 - необходимо рассчитать), количество имеющихся преметов (-1 - неогрниченное количество)
-	float arr[NUMBEROFITEMS][COLUMNS] = {{ 1, 1, 2, 1, -1 },
-										 { 2, 5, 6, 2, -1 }, 
-										 { 3, 3, 4, 5, -1 }};
+	float arr[NUMBEROFITEMS][COLUMNS] = {{ 1, 1, 2, 0, -1 },
+										 { 2, 5, 6, 0, 2 }, 
+										 { 3, 3, 4, 0, -1 }};
 
 	printInfo(NUMBEROFITEMS, arr);			// вывод информации на экран
 	calcUnitCost(NUMBEROFITEMS, arr);		// расчёт удельной стоимости 1 кг предмета
 	sortArrayDesc(NUMBEROFITEMS, arr);		// сортировка строк массива
-	filling(NUMBEROFITEMS, arr);
-
-	//int* arrayResult = filling(NUMBEROFITEMS, arr);			// заполнение рюкзака
+	printInfo(NUMBEROFITEMS, arr);			// вывод обновлённой информации на экран
+	filling(NUMBEROFITEMS, arr);			// заполнение рюкзака + вывод результата
 
 	return 0;
 }
