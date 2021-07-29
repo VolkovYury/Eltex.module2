@@ -1,129 +1,112 @@
 ﻿// В строке найти последовательности цифр, каждую из них считать числом в той системе счисления, которая соответствует первой цифре, 
-// заменить числа в строке символами с кодами, полученными из этих чисел.
+// привести найденные числа к десятичной СС.
 // Пример: aaa2010101bbb8343ccc – двоичная и восьмиричная системы счисления.
 
 #include <stdio.h>
-#include <ctype.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include <locale.h>
 #include <math.h>
 
-#define MAXSTRING 100
+#define MAXSTRLEN 100
 
+void numbersInString(char* str);
+void numberProcessing(char* n);
+int inDecimal(char* num, int notation, int sysNum);
 
-// функция для перевода чисел в десятичную систему. В исходной строке могут быть определены и обработаны только систмеы с основаниями от 2 до 9.
-int inDecimal(char *num, int notation, int sysNum) {
-	int result = 0;
+int main() {
+	char* locale = setlocale(LC_ALL, "");
 
-	for (int i = 0; i < sysNum; i++) {
-		int x = num[i] - 48;
-		result += x * pow(notation, (sysNum-i-1));
-	}
+	char str[MAXSTRLEN+1] = "eee8343c2ttt\0";
 
-	return result;
+	numbersInString(str); // функция поиска чисел в строке
+
+	return 0;
 }
 
+// функция поиска чисел в строке
+void numbersInString(char *str) {
+	char result[MAXSTRLEN+1];	// строка, где будет храниться найденное число
+	int indexStr = 0;					// индекс элемента строки
+	bool prewNum = false;		// флаг "предыдущий символ - число"
 
-// функция, обрабатывающая найденное число
+	for (int i = 0; str[i] != '\0'; i++) {
+		// Проверка символа на принадлежность цифрам. 48...57 - ascii code цифр от 0 до 9
+		if (str[i] >= 48 && str[i] <= 57) {
+
+			result[indexStr] = str[i];
+			indexStr++;
+
+			// на случай, если число будет стоять в конце строки. Иначе последнее число не обрабатывается
+			if (str[i + 1] == '\0') {
+				result[indexStr] = '\0';
+				numberProcessing(result);
+				indexStr = 0;
+			}
+
+			prewNum = true;
+		}
+		else {
+			// если предыдущий символ был числом, тогда
+			if (prewNum) {
+				result[indexStr] = '\0';
+				numberProcessing(result);
+				indexStr = 0;
+			}
+
+			prewNum = false;
+		}
+	}
+}
+
+// функция, обрабатывающая найденное число. Обработка заключена в определении системы счисления и переводе 
 void numberProcessing(char* n) {
 	printf("Найдена числовая конструкция: ");
 	printf("%s\n", n);
-	int maxNum = 0, i = 0, sysNum = 0; // максимальная цифра, номер элемента, количество цифр в исходном числе
-	char stringNumber[MAXSTRING]; // число в указанной системе счисления в формате строки
-	int intNumber = 0; // число в указанной системе счисления в формате integer
 
-	int notation = n[0] - 48; // ascii-код первого символа в число. Переменная - система счисления
+	char stringNumber[MAXSTRLEN+1];		// число в указанной системе счисления в формате строки
+	int indexStr = 1;					// индекс элемента строки
+	int maxNum = 0;						// максимальная цифра
 
-	// поиск наибольшей цифры в числе. Необходимо для проверки на корректность указанной системы счисления + количество цифр в числе
-	while (n[i] != '\0') {
-		int value = n[i] - 48;
+	// поиск наибольшей цифры в числе. Необходимо для проверки на корректность указанной системы счисления
+	while (n[indexStr] != '\0') {
+		int value = n[indexStr] - 48;
 
-		if (i != 0) {
-			if (value > maxNum) {
-				maxNum = value;
-			}
-
-			stringNumber[i-1] = n[i];
+		if (value > maxNum) {
+			maxNum = value;
 		}
 
-		i++;
+		stringNumber[indexStr - 1] = n[indexStr];
+
+		// выйти из цикла, если всё число считано
+		if (n[indexStr+1] == '\0') {
+			stringNumber[indexStr] = '\0';
+			break;
+		}
+
+		indexStr++;
 	}
 
-	stringNumber[i - 1] = '\0';
-	intNumber = atoi(stringNumber);
-
-	sysNum = i - 1;
-
-	// если число может быть обработано, тогда
-	if (notation > maxNum && sysNum != 0) {
-		printf("Основание системы счисления: %d, число в данной системе счисления: %d, число в десятичной системе счисления: %d\n", notation, intNumber, inDecimal(&stringNumber, notation, sysNum));
+	// Число может быть обработано если основание СС строго больше максимальной цифры в найденном числе
+	if ((int)(n[0] - 48) > maxNum && indexStr > 1) {
+		printf("Основание системы счисления: %d, число в данной системе счисления: %s, число в десятичной системе счисления: %d\n", (int)(n[0] - 48), stringNumber, inDecimal(stringNumber, (int)(n[0] - 48), indexStr));
 		printf("\n");
 	}
-	// иначе... 
 	else {
 		printf("Данная числовая конструкция не может быть интерпретирована\n");
 		printf("\n");
 	}
 }
 
-void numbersInString(char* str) {
-	char result[MAXSTRING]; // строка, где будет храниться найденное число
+// функция для перевода чисел в десятичную систему. В исходной строке могут быть определены и обработаны только СС с основаниями от 2 до 9 включительно (исходя из условий).
+int inDecimal(char* num, int notation, int sysNum) {
+	int result = 0;
 
-	int indexStr = 0;
-	int count = 0;
-	bool prewNum = false; // флаг "предыдущий символ был числом"
+	for (int i = 0; i < sysNum; i++) {
+		int x = num[i] - 48;
+		double power = (double) sysNum - (double) i - 1;
 
-	for (int i = 0; str[i] != '\0'; i++) {
-		// если обрабатываемый символ - число, тогда ...
-		if (isdigit(str[i])) {
-			// если предыдущий символ также был числом, тогда
-			if (prewNum) {
-				count++;
-				result[count] = str[i]; // строка с числом заполняется
-			}
-			// если предыдущий символ не был числом
-			else {
-				result[0] = str[i]; // начинает заполняться строка
-			}
-
-			// на случай, если число будет стоять в конце строки
-			if (str[i + 1] == '\0') {
-				count++;
-				result[count] = '\0';
-				numberProcessing(&result);
-				count = 0;
-				memset(result, 0, 100);
-			}
-
-			prewNum = true;
-		}
-		// если обрабатываемый символ - не число, тогда ...
-		else {
-			// если предыдущий символ был числом, тогда
-			if (prewNum) {
-				// записывается символ окончания строки
-				count++;
-				result[count] = '\0';
-
-				numberProcessing(&result);
-
-				//очищение строки с найденным числом (для поиска следующего)
-				count = 0;
-				memset(result, 0, 100);
-			}
-			prewNum = false;
-		}
-
+		result += x * pow(notation, power);
 	}
-}
 
-int main() {
-	char* locale = setlocale(LC_ALL, "");
-
-	char str[MAXSTRING] = "eee8343c12ttt\0";
-
-	numbersInString(&str); // функция поиска чисел в строке
-
-	return 0;
+	return result;
 }
