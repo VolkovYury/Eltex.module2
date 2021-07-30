@@ -21,7 +21,7 @@
 
 Дано число и его система счисления. Орагнизовать систему, которая будет преобразовывать исходное число в число других систем счисления.
 
-Файл с выполненным заданием: [lw1.3.c](https://github.com/VolkovYury/Eltex.module2/blob/8897b4723ad5aa022938edf5e49be3c592d3aebf/lw1.3.c)
+Файл с выполненным заданием: [lw1.3.c](https://github.com/VolkovYury/Eltex.module2/blob/abeb348da3576d0d5ec0d73eee3a4033f34b12ea/lw1.3.c)
 
 ### Задание 3
 
