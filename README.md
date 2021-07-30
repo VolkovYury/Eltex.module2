@@ -85,4 +85,4 @@
 
 Реализация протокола Диффи — Хеллмана
 
-Файл с выполненным заданием: [Diffie-Hellman.c](https://github.com/VolkovYury/Eltex.module2/blob/8897b4723ad5aa022938edf5e49be3c592d3aebf/Diffie-Hellman.c)
+Файл с выполненным заданием: [Diffie-Hellman.c](https://github.com/VolkovYury/Eltex.module2/blob/d0a4bb7bb1cb572619ecc8e1ff34e05fa8d2ec16/Diffie%E2%80%93Hellman.c)
